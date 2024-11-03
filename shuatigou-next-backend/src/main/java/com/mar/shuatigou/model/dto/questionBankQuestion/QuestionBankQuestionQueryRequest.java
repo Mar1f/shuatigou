@@ -1,11 +1,10 @@
-package com.mar.shuatigou.model.dto.questionbankquestion;
+package com.mar.shuatigou.model.dto.questionBankQuestion;
 
 import com.mar.shuatigou.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 查询题库题目关联表请求

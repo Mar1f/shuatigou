@@ -10,7 +10,6 @@ import com.mar.shuatigou.constant.UserConstant;
 import com.mar.shuatigou.exception.BusinessException;
 import com.mar.shuatigou.exception.ThrowUtils;
 import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionAddRequest;
-import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionEditRequest;
 import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionQueryRequest;
 import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionUpdateRequest;
 import com.mar.shuatigou.model.entity.QuestionBankQuestion;
@@ -199,38 +198,6 @@ public class QuestionBankQuestionController {
                 questionBankQuestionService.getQueryWrapper(questionBankQuestionQueryRequest));
         // 获取封装类
         return ResultUtils.success(questionBankQuestionService.getQuestionBankQuestionVOPage(questionBankQuestionPage, request));
-    }
-
-    /**
-     * 编辑题库题目关联表（给用户使用）
-     *
-     * @param questionBankQuestionEditRequest
-     * @param request
-     * @return
-     */
-    @PostMapping("/edit")
-    public BaseResponse<Boolean> editQuestionBankQuestion(@RequestBody QuestionBankQuestionEditRequest questionBankQuestionEditRequest, HttpServletRequest request) {
-        if (questionBankQuestionEditRequest == null || questionBankQuestionEditRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        // todo 在此处将实体类和 DTO 进行转换
-        QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
-        BeanUtils.copyProperties(questionBankQuestionEditRequest, questionBankQuestion);
-        // 数据校验
-        questionBankQuestionService.validQuestionBankQuestion(questionBankQuestion, false);
-        User loginUser = userService.getLoginUser(request);
-        // 判断是否存在
-        long id = questionBankQuestionEditRequest.getId();
-        QuestionBankQuestion oldQuestionBankQuestion = questionBankQuestionService.getById(id);
-        ThrowUtils.throwIf(oldQuestionBankQuestion == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可编辑
-        if (!oldQuestionBankQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        // 操作数据库
-        boolean result = questionBankQuestionService.updateById(questionBankQuestion);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(true);
     }
 
     // endregion

@@ -1,6 +1,5 @@
 package com.mar.shuatigou.model.vo;
 
-import cn.hutool.json.JSONUtil;
 import com.mar.shuatigou.model.entity.QuestionBank;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -27,15 +26,31 @@ public class QuestionBankVO implements Serializable {
     private String title;
 
     /**
-     * 内容
+     * 描述
      */
-    private String content;
+    private String description;
+    /**
+     * 审核人 id
+     */
+    private Long reviewerId;
 
+    /**
+     * 审核时间
+     */
+    private Date reviewTime;
+    /**
+     * 图片
+     */
+    private String picture;
     /**
      * 创建用户 id
      */
     private Long userId;
 
+    /**
+     * 浏览量
+     */
+    private Integer viewNum;
     /**
      * 创建时间
      */
@@ -68,8 +83,6 @@ public class QuestionBankVO implements Serializable {
         }
         QuestionBank questionBank = new QuestionBank();
         BeanUtils.copyProperties(questionBankVO, questionBank);
-        List<String> tagList = questionBankVO.getTagList();
-        questionBank.setTags(JSONUtil.toJsonStr(tagList));
         return questionBank;
     }
 
@@ -85,7 +98,6 @@ public class QuestionBankVO implements Serializable {
         }
         QuestionBankVO questionBankVO = new QuestionBankVO();
         BeanUtils.copyProperties(questionBank, questionBankVO);
-        questionBankVO.setTagList(JSONUtil.toList(questionBank.getTags(), String.class));
         return questionBankVO;
     }
 }

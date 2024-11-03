@@ -1,9 +1,8 @@
-package com.mar.shuatigou.model.dto.questionbank;
+package com.mar.shuatigou.model.dto.questionBank;
 
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 更新题库请求

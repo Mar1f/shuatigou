@@ -1,16 +1,20 @@
-package com.mar.shuatigou.model.dto.questionbankquestion;
+package com.mar.shuatigou.model.dto.questionBankQuestion;
 
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * 创建题库题目关联表请求
+ * 更新题库题目关联表请求
  *
  */
 @Data
-public class QuestionBankQuestionAddRequest implements Serializable {
+public class QuestionBankQuestionUpdateRequest implements Serializable {
+
+    /**
+     * id
+     */
+    private Long id;
 
     /**
      * 题库 id
