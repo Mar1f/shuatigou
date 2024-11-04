@@ -3,6 +3,7 @@ package com.mar.shuatigou.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mar.shuatigou.common.BaseResponse;
 import com.mar.shuatigou.model.dto.question.QuestionQueryRequest;
 import com.mar.shuatigou.model.entity.Question;
 import com.mar.shuatigou.model.vo.QuestionVO;
@@ -48,4 +49,7 @@ public interface QuestionService extends IService<Question> {
      * @return
      */
     Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage, HttpServletRequest request);
+
+    Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest);
+
 }

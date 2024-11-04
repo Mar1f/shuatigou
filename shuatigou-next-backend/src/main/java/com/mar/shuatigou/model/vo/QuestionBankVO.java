@@ -1,5 +1,7 @@
 package com.mar.shuatigou.model.vo;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mar.shuatigou.model.entity.Question;
 import com.mar.shuatigou.model.entity.QuestionBank;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -71,6 +73,10 @@ public class QuestionBankVO implements Serializable {
      */
     private UserVO user;
 
+    /**
+     * 题库里的题目分页
+     */
+    Page<Question> questionPage;
     /**
      * 封装类转对象
      *

@@ -1,18 +1,26 @@
 package com.mar.shuatigou.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mar.shuatigou.annotation.AuthCheck;
+import com.mar.shuatigou.common.BaseResponse;
 import com.mar.shuatigou.common.ErrorCode;
+import com.mar.shuatigou.common.ResultUtils;
 import com.mar.shuatigou.constant.CommonConstant;
+import com.mar.shuatigou.constant.UserConstant;
 import com.mar.shuatigou.exception.ThrowUtils;
 import com.mar.shuatigou.mapper.QuestionMapper;
 import com.mar.shuatigou.model.dto.question.QuestionQueryRequest;
 import com.mar.shuatigou.model.entity.Question;
+import com.mar.shuatigou.model.entity.QuestionBankQuestion;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionVO;
 import com.mar.shuatigou.model.vo.UserVO;
+import com.mar.shuatigou.service.QuestionBankQuestionService;
 import com.mar.shuatigou.service.QuestionService;
 import com.mar.shuatigou.service.UserService;
 import com.mar.shuatigou.utils.SqlUtils;
@@ -20,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +49,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     @Resource
     private UserService userService;
-
+    @Resource
+    private QuestionBankQuestionService questionBankQuestionService;
     /**
      * 校验数据
      *
@@ -51,6 +62,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         ThrowUtils.throwIf(question == null, ErrorCode.PARAMS_ERROR);
         // todo 从对象中取值
         String title = question.getTitle();
+        String content = question.getContent();
         // 创建数据时，参数不能为空
         if (add) {
             // todo 补充校验规则
@@ -60,6 +72,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         // todo 补充校验规则
         if (StringUtils.isNotBlank(title)) {
             ThrowUtils.throwIf(title.length() > 80, ErrorCode.PARAMS_ERROR, "标题过长");
+        }
+        if (StringUtils.isNotBlank(content)) {
+            ThrowUtils.throwIf(content.length() > 10240, ErrorCode.PARAMS_ERROR, "内容过长");
         }
     }
 
@@ -182,4 +197,32 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         return questionVOPage;
     }
 
+    public Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest) {
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        // 题目表的查询条件
+        QueryWrapper<Question> queryWrapper = this.getQueryWrapper(questionQueryRequest);
+        // 根据题库查询题目列表接口
+        Long questionBankId = questionQueryRequest.getQuestionBankId();
+        if (questionBankId != null) {
+            LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                    .select(QuestionBankQuestion::getQuestionId)
+                    .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
+            List<QuestionBankQuestion> questionList = questionBankQuestionService.list(lambdaQueryWrapper);
+
+            if (CollUtil.isNotEmpty(questionList)) {
+                Set<Long> questionIdSet = questionList.stream()
+                        .map(QuestionBankQuestion::getQuestionId)
+                        .collect(Collectors.toSet());
+                queryWrapper.in("id",questionIdSet);
+            }
+            // 限制爬虫
+            ThrowUtils.throwIf(size > 60, ErrorCode.PARAMS_ERROR);
+        }
+
+        // 查询数据库
+        Page<Question> questionPage = this.page(new Page<>(current, size),
+                queryWrapper);
+        return questionPage;
+    }
 }
