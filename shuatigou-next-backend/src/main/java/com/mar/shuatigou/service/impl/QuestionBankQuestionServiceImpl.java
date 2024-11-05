@@ -9,16 +9,21 @@ import com.mar.shuatigou.constant.CommonConstant;
 import com.mar.shuatigou.exception.ThrowUtils;
 import com.mar.shuatigou.mapper.QuestionBankQuestionMapper;
 import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionQueryRequest;
+import com.mar.shuatigou.model.entity.Question;
+import com.mar.shuatigou.model.entity.QuestionBank;
 import com.mar.shuatigou.model.entity.QuestionBankQuestion;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionBankQuestionVO;
 import com.mar.shuatigou.model.vo.UserVO;
 import com.mar.shuatigou.service.QuestionBankQuestionService;
+import com.mar.shuatigou.service.QuestionBankService;
+import com.mar.shuatigou.service.QuestionService;
 import com.mar.shuatigou.service.UserService;
 import com.mar.shuatigou.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -40,6 +45,11 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
     @Resource
     private UserService userService;
 
+    @Resource
+    @Lazy
+    private QuestionService questionService;
+    @Resource
+    private QuestionBankService questionBankService;
     /**
      * 校验数据
      *
@@ -49,19 +59,19 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
     @Override
     public void validQuestionBankQuestion(QuestionBankQuestion questionBankQuestion, boolean add) {
         ThrowUtils.throwIf(questionBankQuestion == null, ErrorCode.PARAMS_ERROR);
-//        // todo 从对象中取值
-//        String title = questionBankQuestion.getTitle();
-//        // 创建数据时，参数不能为空
-//        if (add) {
-//            // todo 补充校验规则
-//            ThrowUtils.throwIf(StringUtils.isBlank(title), ErrorCode.PARAMS_ERROR);
-//        }
-//        // 修改数据时，有参数则校验
-//        // todo 补充校验规则
-//        if (StringUtils.isNotBlank(title)) {
-//            ThrowUtils.throwIf(title.length() > 80, ErrorCode.PARAMS_ERROR, "标题过长");
-//        }
+        // 题目和题库必须存在
+        Long questionId = questionBankQuestion.getQuestionId();
+        if (questionId != null) {
+            Question question = questionService.getById(questionId);
+            ThrowUtils.throwIf(question == null, ErrorCode.NOT_FOUND_ERROR, "题目不存在");
+        }
+        Long questionBankId = questionBankQuestion.getQuestionBankId();
+        if (questionBankId != null) {
+            QuestionBank questionBank = questionBankService.getById(questionBankId);
+            ThrowUtils.throwIf(questionBank == null, ErrorCode.NOT_FOUND_ERROR, "题库不存在");
+        }
     }
+
 
     /**
      * 获取查询条件
