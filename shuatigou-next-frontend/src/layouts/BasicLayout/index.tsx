@@ -1,17 +1,24 @@
 "use client";
-import {GithubFilled, LogoutOutlined, SearchOutlined,} from "@ant-design/icons";
-import {ProLayout} from "@ant-design/pro-components";
-import {Dropdown, Input} from "antd";
+import {
+  GithubFilled,
+  LogoutOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { ProLayout } from "@ant-design/pro-components";
+import { Dropdown, Input, message } from "antd";
 import React from "react";
 import Image from "next/image";
-import {usePathname} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
-import {menus} from "../../../config/menu";
+import { menus } from "../../../config/menu";
 import "./index.css";
-import {useSelector} from "react-redux";
-import {RootState} from "@/stores";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/stores";
 import getAccessibleMenus from "@/access/menuAccess";
+import { userLogoutUsingPost } from "@/api/userController";
+import { setLoginUser } from "@/stores/loginUser";
+import { DEFAULT_USER } from "@/constants/user";
 
 /**
  * 搜索条
@@ -57,6 +64,23 @@ interface Props {
 export default function BasicLayout({ children }: Props) {
   const pathname = usePathname();
   const loginUser = useSelector((state: RootState) => state.loginUser);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  /**
+   * 用户注销
+   */
+  const userLogout = async () => {
+    try {
+      await userLogoutUsingPost();
+      message.success("已退出登录");
+      dispatch(setLoginUser(DEFAULT_USER));
+      router.push("/user/login");
+    } catch (e) {
+      message.error("操作失败，" + e.message);
+    }
+    return;
+  };
 
   return (
     <div
@@ -81,10 +105,19 @@ export default function BasicLayout({ children }: Props) {
           pathname,
         }}
         avatarProps={{
-          src: loginUser.userAvatar || "/assets/notLoginUser.png",
+          src: loginUser.userAvatar || "/assets/logo.png",
           size: "small",
           title: loginUser.userName || "未登录",
           render: (props, dom) => {
+            if(!loginUser.id) {
+              return (
+                  <div onClick={()=>{
+                    router.push("/user/login");
+                  }}>{
+                    dom
+                  }</div>
+              )
+            }
             return (
               <Dropdown
                 menu={{
@@ -95,6 +128,13 @@ export default function BasicLayout({ children }: Props) {
                       label: "退出登录",
                     },
                   ],
+                  onClick: async (event: { key: React.Key }) => {
+                    const { key } = event;
+                    // 退出登录
+                    if (key === "logout") {
+                      userLogout();
+                    }
+                  },
                 }}
               >
                 {dom}
