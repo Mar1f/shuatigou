@@ -3,8 +3,10 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 import BasicLayout from "@/layouts/BasicLayout";
 import React, {useCallback, useEffect} from "react";
-import store from '@/stores'
-import { Provider } from 'react-redux'
+import store, {AppDispatch} from '@/stores'
+import {Provider, useDispatch} from 'react-redux'
+import loginUser, {setLoginUser} from "@/stores/loginUser";
+import {getLoginUserUsingGet} from "@/api/userController";
 
 /**
  * 执行初始化逻辑的布局（多封装一层）
@@ -16,16 +18,28 @@ const InitLayout: React.FC<
         children: React.ReactNode;
     }>
 > = ({ children }) => {
+    const dispatch=useDispatch<AppDispatch>();
     /**
      * 全局初始化函数，有全局单次调用的代码，都可以写到这里
      */
-    const doInit = useCallback(() => {
-        console.log("hello 欢迎来到我的项目");
+    const doInitLoginUser = useCallback(async () => {
+        const res = await getLoginUserUsingGet();
+        if(res.data){
+
+        }
+        else {
+            setTimeout(
+                () => {
+                    const testUser = {username:"测试登录",id:1,userAvatar: "https://img2.baidu.com/it/u=3258768447,4187215660&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"}
+                    dispatch(setLoginUser(testUser));
+                },3000);
+        }
+        console.log("hello 欢迎来到刷题狗");
     }, []);
 
     // 只执行一次
     useEffect(() => {
-        doInit();
+        doInitLoginUser();
     }, []);
 
     return <>{children}</>;
