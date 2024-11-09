@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "@/stores/index";
 import AccessEnum from "@/access/accessEnum";
 
 // 默认用户

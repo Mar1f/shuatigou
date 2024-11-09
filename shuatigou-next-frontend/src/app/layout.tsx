@@ -5,10 +5,8 @@ import BasicLayout from "@/layouts/BasicLayout";
 import React, { useCallback, useEffect } from "react";
 import store, { AppDispatch } from "@/stores";
 import { Provider, useDispatch } from "react-redux";
-import loginUser, { setLoginUser } from "@/stores/loginUser";
 import { getLoginUserUsingGet } from "@/api/userController";
 import AccessLayout from "@/access/AccessLayout";
-import ACCESS_ENUM from "@/access/accessEnum";
 
 /**
  * 执行初始化逻辑的布局（多封装一层）
@@ -28,16 +26,17 @@ const InitLayout: React.FC<
     const res = await getLoginUserUsingGet();
     if (res.data) {
     } else {
-      setTimeout(() => {
-        const testUser = {
-          username: "测试登录",
-          id: 1,
-          userAvatar:
-            "https://img2.baidu.com/it/u=3258768447,4187215660&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-          userRole: ACCESS_ENUM.ADMIN,
-        };
-        dispatch(setLoginUser(testUser));
-      }, 3000);
+      // 模拟登录
+      // setTimeout(() => {
+      //   const testUser = {
+      //     username: "测试登录",
+      //     id: 1,
+      //     userAvatar:
+      //       "https://img2.baidu.com/it/u=3258768447,4187215660&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+      //     userRole: ACCESS_ENUM.ADMIN,
+      //   };
+      //   dispatch(setLoginUser(testUser));
+      // }, 3000);
     }
     console.log("hello 欢迎来到刷题狗");
   }, []);

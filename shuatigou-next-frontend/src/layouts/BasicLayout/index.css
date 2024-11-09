@@ -4,3 +4,9 @@
 .ant-pro-layout-top{
     height: 100%;
 }
+.md-editor .editor-container {
+    text-align: left; /* 确保文本左对齐 */
+    font-size: 16px;  /* 根据需要调整字体大小 */
+    line-height: 1.5; /* 设置合适的行间距 */
+    padding: 10px;    /* 给编辑区增加一些内边距 */
+}
