@@ -12,7 +12,7 @@ export const menus = [
   {
     path: "/banks",
     name: "题库",
-    access: ACCESS_ENUM.USER || AccessEnum.VIP,
+    // access: ACCESS_ENUM.USER || AccessEnum.VIP,
   },
   {
     path: "/questions",

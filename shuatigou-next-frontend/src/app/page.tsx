@@ -1,59 +1,55 @@
-import styles from "./page.module.css";
+"use server";
+import Title from "antd/es/typography/Title";
+import { Divider, Flex, message } from "antd";
+import Link from "next/link";
+import { listQuestionBankVoByPageUsingPost } from "@/api/questionBankController";
+import { listQuestionVoByPageUsingPost } from "@/api/questionController";
+import QuestionBankList from "@/components/QuestionBankList";
+import QuestionList from "@/components/QuestionList";
+import "./index.css";
 
-export default function HomePage() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+/**
+ * 主页
+ * @constructor
+ */
+export default async function HomePage() {
+    let questionBankList = [];
+    let questionList = [];
+    try {
+        const res = await listQuestionBankVoByPageUsingPost({
+            pageSize: 12,
+            sortField: "createTime",
+            sortOrder: "descend",
+        });
+        questionBankList = res.data.records ?? [];
+    } catch (e) {
+        message.error("获取题库列表失败，" + e.message);
+    }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+    try {
+        const res = await listQuestionVoByPageUsingPost({
+            pageSize: 12,
+            sortField: "createTime",
+            sortOrder: "descend",
+        });
+        questionList = res.data.records ?? [];
+    } catch (e) {
+        message.error("获取题目列表失败，" + e.message);
+    }
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    return (
+        <div id="homePage" className="max-width-content">
+            <Flex justify="space-between" align="center">
+                <Title level={3}>最新题库</Title>
+                <Link href={"/banks"}>查看更多</Link>
+            </Flex>
+            <QuestionBankList questionBankList={questionBankList} />
+            <Divider />
+            <Flex justify="space-between" align="center">
+                <Title level={3}>最新题目</Title>
+                <Link href={"/questions"}>查看更多</Link>
+            </Flex>
+            <QuestionList questionList={questionList} />
+        </div>
+    );
 }

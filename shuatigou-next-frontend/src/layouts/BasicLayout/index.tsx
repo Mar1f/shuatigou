@@ -106,7 +106,7 @@ export default function BasicLayout({ children }: Props) {
         avatarProps={{
           src: loginUser.userAvatar || "/assets/logo.png",
           size: "small",
-          title: loginUser.userName || "未登录",
+          title: loginUser.userName || "刷题狗",
           render: (props, dom) => {
             if(!loginUser.id) {
               return (

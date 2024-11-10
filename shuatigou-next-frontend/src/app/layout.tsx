@@ -1,56 +1,51 @@
 "use client";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import "./globals.css";
 import BasicLayout from "@/layouts/BasicLayout";
 import React, { useCallback, useEffect } from "react";
-import store, { AppDispatch } from "@/stores";
 import { Provider, useDispatch } from "react-redux";
+import store, { AppDispatch } from "@/stores";
 import { getLoginUserUsingGet } from "@/api/userController";
 import AccessLayout from "@/access/AccessLayout";
 import { setLoginUser } from "@/stores/loginUser";
+import "./globals.css";
 import { usePathname } from "next/navigation"; // 引入 usePathname
 
 /**
- * 执行初始化逻辑的布局（多封装一层）
+ * 全局初始化逻辑
  * @param children
  * @constructor
  */
 const InitLayout: React.FC<
-  Readonly<{
-    children: React.ReactNode;
-  }>
+    Readonly<{
+      children: React.ReactNode;
+    }>
 > = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
-  /**
-   * 全局初始化函数，有全局单次调用的代码，都可以写到这里
-   */
+  // 初始化全局用户状态
   const doInitLoginUser = useCallback(async () => {
     const res = await getLoginUserUsingGet();
     if (res.data) {
-      // 更新全局用户的状态
+      // 更新全局用户状态
       dispatch(setLoginUser(res.data));
     } else {
-      // 模拟登录
+      // 仅用于测试
       // setTimeout(() => {
       //   const testUser = {
-      //     username: "测试登录",
+      //     userName: "测试登录",
       //     id: 1,
-      //     userAvatar:
-      //       "https://img2.baidu.com/it/u=3258768447,4187215660&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
-      //     userRole: ACCESS_ENUM.ADMIN,
+      //     userAvatar: "https://www.code-nav.cn/logo.png",
+      //     userRole: ACCESS_ENUM.ADMIN
       //   };
       //   dispatch(setLoginUser(testUser));
       // }, 3000);
     }
-    console.log("hello 欢迎来到刷题狗");
   }, []);
 
   // 只执行一次
   useEffect(() => {
     doInitLoginUser();
   }, []);
-
-  return <>{children}</>;
+  return children;
 };
 
 export default function RootLayout({
