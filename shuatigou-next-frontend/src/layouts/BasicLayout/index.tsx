@@ -83,8 +83,7 @@ export default function BasicLayout({ children }: Props) {
   };
 
   return (
-    <div
-      id="basicLayout"
+    <div id="basicLayout"
       style={{
         height: "100vh",
         overflow: "auto",

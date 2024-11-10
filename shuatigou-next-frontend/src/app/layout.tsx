@@ -16,12 +16,11 @@ import { usePathname } from "next/navigation"; // 引入 usePathname
  * @constructor
  */
 const InitLayout: React.FC<
-    Readonly<{
-      children: React.ReactNode;
-    }>
+  Readonly<{
+    children: React.ReactNode;
+  }>
 > = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
-  console.log(11)
   /**
    * 全局初始化函数，有全局单次调用的代码，都可以写到这里
    */
@@ -55,31 +54,32 @@ const InitLayout: React.FC<
 };
 
 export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   const pathname = usePathname(); // 获取当前路径
 
   // 判断是否是登录或注册页面
-  const isAuthPage = pathname.startsWith("/user/login") || pathname.startsWith("/user/register");
+  const isAuthPage =
+    pathname.startsWith("/user/login") || pathname.startsWith("/user/register");
 
   return (
-      <html lang="en">
+    <html lang="en">
       <body>
-      <AntdRegistry>
-        <Provider store={store}>
-          {/* 如果是登录或注册页面，不显示 BasicLayout 和 AccessLayout */}
-          {isAuthPage ? (
+        <AntdRegistry>
+          <Provider store={store}>
+            {/* 如果是登录或注册页面，不显示 BasicLayout 和 AccessLayout */}
+            {isAuthPage ? (
               <>{children}</> // 直接渲染子组件
-          ) : (
+            ) : (
               <AccessLayout>
                 <BasicLayout>{children}</BasicLayout>
               </AccessLayout>
-          )}
-        </Provider>
-      </AntdRegistry>
+            )}
+          </Provider>
+        </AntdRegistry>
       </body>
-      </html>
+    </html>
   );
 }
