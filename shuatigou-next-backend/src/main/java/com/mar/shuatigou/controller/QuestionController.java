@@ -1,10 +1,6 @@
 package com.mar.shuatigou.controller;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mar.shuatigou.annotation.AuthCheck;
 import com.mar.shuatigou.common.BaseResponse;
@@ -19,11 +15,8 @@ import com.mar.shuatigou.model.dto.question.QuestionEditRequest;
 import com.mar.shuatigou.model.dto.question.QuestionQueryRequest;
 import com.mar.shuatigou.model.dto.question.QuestionUpdateRequest;
 import com.mar.shuatigou.model.entity.Question;
-import com.mar.shuatigou.model.entity.QuestionBank;
-import com.mar.shuatigou.model.entity.QuestionBankQuestion;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionVO;
-import com.mar.shuatigou.service.QuestionBankQuestionService;
 import com.mar.shuatigou.service.QuestionService;
 import com.mar.shuatigou.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +25,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Wrapper;
 import java.util.List;
 
 /**
  * 题目接口
- *
  */
 @RestController
 @RequestMapping("/question")
@@ -167,6 +158,8 @@ public class QuestionController {
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
+        ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        // 查询数据库
         Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
         return ResultUtils.success(questionPage);
     }
@@ -181,13 +174,12 @@ public class QuestionController {
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
                                                                HttpServletRequest request) {
-        long current = questionQueryRequest.getCurrent();
+        ThrowUtils.throwIf(questionQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         // 查询数据库
-        Page<Question> questionPage = questionService.page(new Page<>(current, size),
-                questionService.getQueryWrapper(questionQueryRequest));
+        Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
         // 获取封装类
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
