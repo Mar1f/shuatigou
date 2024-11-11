@@ -544,7 +544,7 @@ declare namespace API {
     description?: string;
     id?: number;
     picture?: string;
-    questionPage?: PageQuestion_;
+    questionPage?: PageQuestionVO_;
     reviewTime?: string;
     reviewerId?: number;
     tagList?: string[];

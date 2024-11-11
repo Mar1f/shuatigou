@@ -2,10 +2,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import loginUser from "@/stores/loginUser";
 
 const store = configureStore({
-    reducer: {
-        // 在这里存放状态
-        loginUser,
-    },
+  reducer: {
+    // 在这里存放状态
+    loginUser,
+  },
 });
 
 // 用于类型推断和提示

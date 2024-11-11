@@ -6,12 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mar.shuatigou.annotation.AuthCheck;
-import com.mar.shuatigou.common.BaseResponse;
 import com.mar.shuatigou.common.ErrorCode;
-import com.mar.shuatigou.common.ResultUtils;
 import com.mar.shuatigou.constant.CommonConstant;
-import com.mar.shuatigou.constant.UserConstant;
 import com.mar.shuatigou.exception.ThrowUtils;
 import com.mar.shuatigou.mapper.QuestionMapper;
 import com.mar.shuatigou.model.dto.question.QuestionQueryRequest;
@@ -28,12 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +34,6 @@ import java.util.stream.Collectors;
 
 /**
  * 题目服务实现
- *
  */
 @Service
 @Slf4j
@@ -49,8 +41,10 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
 
     @Resource
     private UserService userService;
+
     @Resource
     private QuestionBankQuestionService questionBankQuestionService;
+
     /**
      * 校验数据
      *
@@ -101,7 +95,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         List<String> tagList = questionQueryRequest.getTags();
         Long userId = questionQueryRequest.getUserId();
         String answer = questionQueryRequest.getAnswer();
-
         // todo 补充需要的查询条件
         // 从多字段中搜索
         if (StringUtils.isNotBlank(searchText)) {
@@ -152,7 +145,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         UserVO userVO = userService.getUserVO(user);
         questionVO.setUser(userVO);
         // endregion
-
         return questionVO;
     }
 
@@ -181,7 +173,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         Set<Long> userIdSet = questionList.stream().map(Question::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
-
         // 填充信息
         questionVOList.forEach(questionVO -> {
             Long userId = questionVO.getUserId();
@@ -197,6 +188,12 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         return questionVOPage;
     }
 
+    /**
+     * 分页获取题目列表
+     *
+     * @param questionQueryRequest
+     * @return
+     */
     public Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest) {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
@@ -205,24 +202,26 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> i
         // 根据题库查询题目列表接口
         Long questionBankId = questionQueryRequest.getQuestionBankId();
         if (questionBankId != null) {
+            // 查询题库内的题目 id
             LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
                     .select(QuestionBankQuestion::getQuestionId)
                     .eq(QuestionBankQuestion::getQuestionBankId, questionBankId);
             List<QuestionBankQuestion> questionList = questionBankQuestionService.list(lambdaQueryWrapper);
-
             if (CollUtil.isNotEmpty(questionList)) {
+                // 取出题目 id 集合
                 Set<Long> questionIdSet = questionList.stream()
                         .map(QuestionBankQuestion::getQuestionId)
                         .collect(Collectors.toSet());
-                queryWrapper.in("id",questionIdSet);
+                // 复用原有题目表的查询条件
+                queryWrapper.in("id", questionIdSet);
+            } else {
+                // 题库为空，则返回空列表
+                return new Page<>(current, size, 0);
             }
-            // 限制爬虫
-            ThrowUtils.throwIf(size > 60, ErrorCode.PARAMS_ERROR);
         }
-
         // 查询数据库
-        Page<Question> questionPage = this.page(new Page<>(current, size),
-                queryWrapper);
+        Page<Question> questionPage = this.page(new Page<>(current, size), queryWrapper);
         return questionPage;
     }
+
 }

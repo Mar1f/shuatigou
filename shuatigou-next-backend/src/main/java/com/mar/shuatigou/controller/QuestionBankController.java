@@ -18,11 +18,11 @@ import com.mar.shuatigou.model.entity.Question;
 import com.mar.shuatigou.model.entity.QuestionBank;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionBankVO;
+import com.mar.shuatigou.model.vo.QuestionVO;
 import com.mar.shuatigou.service.QuestionBankService;
 import com.mar.shuatigou.service.QuestionService;
 import com.mar.shuatigou.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 题库接口
- *
  */
 @RestController
 @RequestMapping("/questionBank")
@@ -43,6 +42,7 @@ public class QuestionBankController {
 
     @Resource
     private QuestionService questionService;
+
     @Resource
     private UserService userService;
 
@@ -138,21 +138,25 @@ public class QuestionBankController {
      */
     @GetMapping("/get/vo")
     public BaseResponse<QuestionBankVO> getQuestionBankVOById(QuestionBankQueryRequest questionBankQueryRequest, HttpServletRequest request) {
-        ThrowUtils.throwIf(questionBankQueryRequest == null || questionBankQueryRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(questionBankQueryRequest == null, ErrorCode.PARAMS_ERROR);
         Long id = questionBankQueryRequest.getId();
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         QuestionBank questionBank = questionBankService.getById(id);
         ThrowUtils.throwIf(questionBank == null, ErrorCode.NOT_FOUND_ERROR);
-        Boolean needQueryQuestionList = questionBankQueryRequest.isNeedQueryQuestionList();
-
         // 查询题库封装类
         QuestionBankVO questionBankVO = questionBankService.getQuestionBankVO(questionBank, request);
-        if(needQueryQuestionList){
+        // 是否要关联查询题库下的题目列表
+        boolean needQueryQuestionList = questionBankQueryRequest.isNeedQueryQuestionList();
+        if (needQueryQuestionList) {
             QuestionQueryRequest questionQueryRequest = new QuestionQueryRequest();
             questionQueryRequest.setQuestionBankId(id);
+            // 可以按需支持更多的题目搜索参数，比如分页
+            questionQueryRequest.setPageSize(questionBankQueryRequest.getPageSize());
+            questionQueryRequest.setCurrent(questionBankQueryRequest.getCurrent());
             Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
-            questionBankVO.setQuestionPage(questionPage);
+            Page<QuestionVO> questionVOPage = questionService.getQuestionVOPage(questionPage, request);
+            questionBankVO.setQuestionPage(questionVOPage);
         }
         // 获取封装类
         return ResultUtils.success(questionBankVO);
@@ -184,7 +188,7 @@ public class QuestionBankController {
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionBankVO>> listQuestionBankVOByPage(@RequestBody QuestionBankQueryRequest questionBankQueryRequest,
-                                                               HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         long current = questionBankQueryRequest.getCurrent();
         long size = questionBankQueryRequest.getPageSize();
         // 限制爬虫
@@ -205,7 +209,7 @@ public class QuestionBankController {
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<QuestionBankVO>> listMyQuestionBankVOByPage(@RequestBody QuestionBankQueryRequest questionBankQueryRequest,
-                                                                 HttpServletRequest request) {
+                                                                         HttpServletRequest request) {
         ThrowUtils.throwIf(questionBankQueryRequest == null, ErrorCode.PARAMS_ERROR);
         // 补充查询条件，只查询当前登录用户的数据
         User loginUser = userService.getLoginUser(request);

@@ -16,9 +16,9 @@ import { usePathname } from "next/navigation"; // 引入 usePathname
  * @constructor
  */
 const InitLayout: React.FC<
-    Readonly<{
-      children: React.ReactNode;
-    }>
+  Readonly<{
+    children: React.ReactNode;
+  }>
 > = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   // 初始化全局用户状态
@@ -68,9 +68,9 @@ export default function RootLayout({
             {isAuthPage ? (
               <>{children}</> // 直接渲染子组件
             ) : (
-              <AccessLayout>
-                <BasicLayout>{children}</BasicLayout>
-              </AccessLayout>
+              <BasicLayout>
+                <AccessLayout>{children}</AccessLayout>
+              </BasicLayout>
             )}
           </Provider>
         </AntdRegistry>

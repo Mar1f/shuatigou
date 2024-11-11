@@ -1,8 +1,6 @@
 import { MenuDataItem } from "@ant-design/pro-layout";
 import { CrownOutlined } from "@ant-design/icons";
 import ACCESS_ENUM from "@/access/accessEnum";
-import AccessEnum from "@/access/accessEnum";
-import exp from "constants";
 // 菜单列表
 export const menus = [
   {
@@ -44,7 +42,6 @@ export const menus = [
         name: "题目管理",
         access: ACCESS_ENUM.ADMIN,
       },
-
     ],
   },
 ] as MenuDataItem[];
