@@ -56,117 +56,118 @@ const QuestionAdminPage: React.FC = () => {
      * 表格列配置
      */
     const columns: ProColumns<API.Question>[] = [
-        {
-            title: "id",
-            dataIndex: "id",
-            valueType: "text",
-            hideInForm: true,
+      {
+        title: "id",
+        dataIndex: "id",
+        valueType: "text",
+        hideInForm: true,
+      },
+      {
+        title: "所属题库",
+        dataIndex: "questionBankId",
+        hideInTable: true,
+        hideInForm: true,
+      },
+      {
+        title: "标题",
+        dataIndex: "title",
+        valueType: "text",
+      },
+      {
+        title: "内容",
+        dataIndex: "content",
+        valueType: "text",
+        hideInSearch: true,
+        width: 240,
+        renderFormItem: (item, { fieldProps }, form) => {
+          // 编写要渲染的表单项
+          // value 和 onchange 会通过 form 自动注入
+          return <MdEditor {...fieldProps} />;
         },
-        {
-            title: "所属题库",
-            dataIndex: "questionBankId",
-            hideInTable: true,
-            hideInForm: true,
+      },
+      {
+        title: "答案",
+        dataIndex: "answer",
+        valueType: "text",
+        hideInSearch: true,
+        width: 640,
+        renderFormItem: (item, { fieldProps }, form) => {
+          // 编写要渲染的表单项
+          // value 和 onchange 会通过 form 自动注入
+          return <MdEditor {...fieldProps} />;
         },
-        {
-            title: "标题",
-            dataIndex: "title",
-            valueType: "text",
+      },
+      {
+        title: "标签",
+        dataIndex: "tags",
+        valueType: "select",
+        fieldProps: {
+          mode: "tags",
         },
-        {
-            title: "内容",
-            dataIndex: "content",
-            valueType: "text",
-            hideInSearch: true,
-            width: 240,
-            renderFormItem: (item, { fieldProps }, form) => {
-                // 编写要渲染的表单项
-                // value 和 onchange 会通过 form 自动注入
-                return <MdEditor {...fieldProps} />;
-            },
+        render: (_, record) => {
+          const tagList = JSON.parse(record.tags || "[]");
+          return <TagList tagList={tagList} />;
         },
-        {
-            title: "答案",
-            dataIndex: "answer",
-            valueType: "text",
-            hideInSearch: true,
-            width: 640,
-            renderFormItem: (item, { fieldProps }, form) => {
-                // 编写要渲染的表单项
-                // value 和 onchange 会通过 form 自动注入
-                return <MdEditor {...fieldProps} />;
-            },
-        },
-        {
-            title: "标签",
-            dataIndex: "tags",
-            valueType: "select",
-            fieldProps: {
-                mode: "tags",
-            },
-            render: (_, record) => {
-                const tagList = JSON.parse(record.tags || "[]");
-                return <TagList tagList={tagList} />;
-            },
-        },
-        {
-            title: "创建用户",
-            dataIndex: "userId",
-            valueType: "text",
-            hideInForm: true,
-        },
-        {
-            title: "创建时间",
-            sorter: true,
-            dataIndex: "createTime",
-            valueType: "dateTime",
-            hideInSearch: true,
-            hideInForm: true,
-        },
-        {
-            title: "编辑时间",
-            sorter: true,
-            dataIndex: "editTime",
-            valueType: "dateTime",
-            hideInSearch: true,
-            hideInForm: true,
-        },
-        {
-            title: "更新时间",
-            sorter: true,
-            dataIndex: "updateTime",
-            valueType: "dateTime",
-            hideInSearch: true,
-            hideInForm: true,
-        },
-        {
-            title: "操作",
-            dataIndex: "option",
-            valueType: "option",
-            render: (_, record) => (
-                <Space size="middle">
-                    <Typography.Link
-                        onClick={() => {
-                            setCurrentRow(record);
-                            setUpdateModalVisible(true);
-                        }}
-                    >
-                        修改
-                    </Typography.Link>
-                    <Typography.Link
-                        onClick={() => {
-                            setCurrentRow(record);
-                            setUpdateBankModalVisible(true);
-                        }}
-                    >
-                        修改所属题库
-                    </Typography.Link>
-                    <Typography.Link type="danger" onClick={() => handleDelete(record)}>
-                        删除
-                    </Typography.Link>
-                </Space>
-            ),
-        },
+      },
+      {
+        title: "创建用户",
+        dataIndex: "userId",
+        valueType: "text",
+        hideInForm: true,
+      },
+      // {
+      //   title: "创建时间",
+      //   sorter: true,
+      //   dataIndex: "createTime",
+      //   valueType: "dateTime",
+      //   hideInSearch: true,
+      //   hideInForm: true,
+      // },
+      // {
+      //   title: "编辑时间",
+      //   sorter: true,
+      //   dataIndex: "editTime",
+      //   valueType: "dateTime",
+      //   // hideInTable:true,
+      //   hideInSearch: true,
+      //   hideInForm: true,
+      // },
+      {
+        title: "更新时间",
+        sorter: true,
+        dataIndex: "updateTime",
+        valueType: "dateTime",
+        hideInSearch: true,
+        hideInForm: true,
+      },
+      {
+        title: "操作",
+        dataIndex: "option",
+        valueType: "option",
+        render: (_, record) => (
+          <Space size="middle">
+            <Typography.Link
+              onClick={() => {
+                setCurrentRow(record);
+                setUpdateModalVisible(true);
+              }}
+            >
+              修改
+            </Typography.Link>
+            <Typography.Link
+              onClick={() => {
+                setCurrentRow(record);
+                setUpdateBankModalVisible(true);
+              }}
+            >
+              修改所属题库
+            </Typography.Link>
+            <Typography.Link type="danger" onClick={() => handleDelete(record)}>
+              删除
+            </Typography.Link>
+          </Space>
+        ),
+      },
     ];
     return (
         <PageContainer>
