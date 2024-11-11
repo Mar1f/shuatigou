@@ -1,10 +1,13 @@
 import { Editor } from "@bytemd/react";
 import gfm from "@bytemd/plugin-gfm";
 import highlight from "@bytemd/plugin-highlight";
+import zhHans from "bytemd/locales/zh_Hans.json";
+import theme from "bytemd-plugin-theme"
+import { themeList } from "bytemd-plugin-theme"
 import "bytemd/dist/index.css";
-import 'github-markdown-css/github-markdown-light.css';
 import "highlight.js/styles/vs.css";
 import "./index.css";
+
 
 interface Props {
     value?: string;
@@ -12,7 +15,9 @@ interface Props {
     placeholder?: string;
 }
 
-const plugins = [gfm(), highlight()];
+const plugins = [gfm(), highlight(),theme({
+    themeList,
+})];
 
 /**
  * Markdown 编辑器
@@ -25,11 +30,10 @@ const MdEditor = (props: Props) => {
     return (
         <div className="md-editor">
             <Editor
+                locale={zhHans}
                 value={value}
                 placeholder={placeholder}
                 mode="split"
-                // mode="preview"
-                // mode="edit"
                 plugins={plugins}
                 onChange={onChange}
             />
