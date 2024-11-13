@@ -6,7 +6,10 @@ import com.mar.shuatigou.model.dto.user.UserQueryRequest;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.LoginUserVO;
 import com.mar.shuatigou.model.vo.UserVO;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 
@@ -122,4 +125,14 @@ public interface UserService extends IService<User> {
      * @return
      */
     boolean addUserSignIn(long userId);
+
+    /**
+     * 获取用户某个年份的签到记录
+     *
+     * @param userId 用户 id
+     * @param year   年份（为空表示当前年份）
+     * @return 签到记录映射
+     */
+    Map<LocalDate, Boolean> getUserSignInRecord(long userId, Integer year);
+
 }

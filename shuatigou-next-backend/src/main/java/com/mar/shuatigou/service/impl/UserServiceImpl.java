@@ -19,8 +19,11 @@ import com.mar.shuatigou.service.UserService;
 import com.mar.shuatigou.utils.SqlUtils;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -298,5 +301,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 当天已签到
         return true;
     }
+
+    /**
+     * 获取用户签到记录
+     *
+     * @param userId 用户 id
+     * @param year   年份
+     * @return 用户签到记录
+     */
+    @Override
+    public Map<LocalDate, Boolean> getUserSignInRecord(long userId, Integer year) {
+        if (year == null) {
+            LocalDate date = LocalDate.now();
+            year = date.getYear();
+        }
+        String key = RedisConstant.getUserSignInRedisKey(year, userId);
+        RBitSet signInBitSet = redissonClient.getBitSet(key);
+        // LinkedHashMap 保证有序
+        Map<LocalDate, Boolean> result = new LinkedHashMap<>();
+        // 获取当前年份的总天数
+        int totalDays = Year.of(year).length();
+        // 依次获取每一天的签到状态
+        for (int dayOfYear = 1; dayOfYear <= totalDays; dayOfYear++) {
+            // 获取 key：当前日期
+            LocalDate currentDate = LocalDate.ofYearDay(year, dayOfYear);
+            // 获取 value：当天是否有刷题
+            boolean hasRecord = signInBitSet.get(dayOfYear);
+            // 将结果放入 map
+            result.put(currentDate, hasRecord);
+        }
+        return result;
+    }
+
 
 }
