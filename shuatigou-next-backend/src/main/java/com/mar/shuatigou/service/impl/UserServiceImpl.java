@@ -298,7 +298,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 当天已签到
         return true;
     }
-
     @Override
     public List<Integer> getUserSignInRecord(long userId, Integer year) {
         if (year == null) {
@@ -311,15 +310,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         BitSet bitSet = signInBitSet.asBitSet();
         // 统计签到的日期
         List<Integer> dayList = new ArrayList<>();
-        // 获取当前年份的总天数
-        int totalDays = Year.of(year).length();
-        // 依次获取每一天的签到状态
-        for (int dayOfYear = 1; dayOfYear <= totalDays; dayOfYear++) {
-            // 获取 value：当天是否有刷题
-            boolean hasRecord = bitSet.get(dayOfYear);
-            if (hasRecord) {
-                dayList.add(dayOfYear);
-            }
+        // 从索引 0 开始查找下一个被设置为 1 的位
+        int index = bitSet.nextSetBit(0);
+        while (index >= 0) {
+            dayList.add(index);
+            // 查找下一个被设置为 1 的位
+            index = bitSet.nextSetBit(index + 1);
         }
         return dayList;
     }
