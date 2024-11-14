@@ -20,6 +20,7 @@ import { userLogoutUsingPost } from "@/api/userController";
 import { setLoginUser } from "@/stores/loginUser";
 import { DEFAULT_USER } from "@/constants/user";
 import SearchInput from "@/layouts/BasicLayout/components/Searchinput";
+import ACCESS_ENUM from "@/access/accessEnum";
 
 interface Props {
   children: React.ReactNode;
@@ -97,6 +98,7 @@ export default function BasicLayout({ children }: Props) {
                           key: "userCenter",
                           icon: <UserOutlined />,
                           label: "个人中心",
+                          access: ACCESS_ENUM.USER
                         },
                         {
                           key: "logout",

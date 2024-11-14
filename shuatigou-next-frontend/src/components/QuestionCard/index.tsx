@@ -3,10 +3,13 @@ import { Card } from "antd";
 import Title from "antd/es/typography/Title";
 import TagList from "@/components/TagList";
 import MdViewer from "@/components/MdViewer";
+import useAddUserSignInRecord from "@/hooks/useAddUserSignInRecord";
 import "./index.css";
+
 interface Props {
     question: API.QuestionVO;
 }
+
 /**
  * 题目卡片
  * @param props
@@ -14,6 +17,10 @@ interface Props {
  */
 const QuestionCard = (props: Props) => {
     const { question } = props;
+
+    // 签到
+    useAddUserSignInRecord();
+
     return (
         <div className="question-card">
             <Card>
@@ -31,4 +38,5 @@ const QuestionCard = (props: Props) => {
         </div>
     );
 };
+
 export default QuestionCard;
