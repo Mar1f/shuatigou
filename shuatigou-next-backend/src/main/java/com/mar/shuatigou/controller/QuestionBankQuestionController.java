@@ -11,6 +11,7 @@ import com.mar.shuatigou.common.ResultUtils;
 import com.mar.shuatigou.constant.UserConstant;
 import com.mar.shuatigou.exception.BusinessException;
 import com.mar.shuatigou.exception.ThrowUtils;
+import com.mar.shuatigou.model.dto.question.QuestionBatchDeleteRequest;
 import com.mar.shuatigou.model.dto.questionBankQuestion.*;
 import com.mar.shuatigou.model.entity.QuestionBankQuestion;
 import com.mar.shuatigou.model.entity.User;

@@ -10,10 +10,7 @@ import com.mar.shuatigou.common.ResultUtils;
 import com.mar.shuatigou.constant.UserConstant;
 import com.mar.shuatigou.exception.BusinessException;
 import com.mar.shuatigou.exception.ThrowUtils;
-import com.mar.shuatigou.model.dto.question.QuestionAddRequest;
-import com.mar.shuatigou.model.dto.question.QuestionEditRequest;
-import com.mar.shuatigou.model.dto.question.QuestionQueryRequest;
-import com.mar.shuatigou.model.dto.question.QuestionUpdateRequest;
+import com.mar.shuatigou.model.dto.question.*;
 import com.mar.shuatigou.model.entity.Question;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionVO;
@@ -255,6 +252,12 @@ public class QuestionController {
         Page<Question> questionPage = questionService.searchFromEs(questionQueryRequest);
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
-
+    @PostMapping("/delete/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchDeleteQuestions(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
+        ThrowUtils.throwIf(questionBatchDeleteRequest == null, ErrorCode.PARAMS_ERROR);
+        questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
+        return ResultUtils.success(true);
+    }
     // endregion
 }
