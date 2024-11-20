@@ -7,6 +7,7 @@ import com.mar.shuatigou.model.dto.questionBankQuestion.QuestionBankQuestionQuer
 import com.mar.shuatigou.model.entity.QuestionBankQuestion;
 import com.mar.shuatigou.model.entity.User;
 import com.mar.shuatigou.model.vo.QuestionBankQuestionVO;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -32,9 +33,9 @@ public interface QuestionBankQuestionService extends IService<QuestionBankQuesti
      * @return
      */
     QueryWrapper<QuestionBankQuestion> getQueryWrapper(QuestionBankQuestionQueryRequest questionBankQuestionQueryRequest);
-    
+
     /**
-     * 获取题库题目关联表封装
+     * 获取题库题目关联封装
      *
      * @param questionBankQuestion
      * @param request
@@ -43,7 +44,7 @@ public interface QuestionBankQuestionService extends IService<QuestionBankQuesti
     QuestionBankQuestionVO getQuestionBankQuestionVO(QuestionBankQuestion questionBankQuestion, HttpServletRequest request);
 
     /**
-     * 分页获取题库题目关联表封装
+     * 分页获取题库题目关联封装
      *
      * @param questionBankQuestionPage
      * @param request
@@ -53,12 +54,24 @@ public interface QuestionBankQuestionService extends IService<QuestionBankQuesti
 
     /**
      * 批量添加题目到题库
-     * @param questionIds
+     * @param questionIdList
      * @param questionBankId
      * @param loginUser
      */
-    void batchAddQuestionsToBank(List<Long> questionIds, Long questionBankId, User loginUser);
+    void batchAddQuestionsToBank(List<Long> questionIdList, long questionBankId, User loginUser);
 
-    void batchRemoveQuestionsFromBank(List<Long> questionIds, Long questionBankId);
+    /**
+     * 批量从题库移除题目
+     * @param questionIdList
+     * @param questionBankId
+     */
+    void batchRemoveQuestionsFromBank(List<Long> questionIdList, long questionBankId);
 
+    /**
+     * 批量添加题目到题库（事务，仅供内部调用）
+     *
+     * @param questionBankQuestions
+     */
+    @Transactional(rollbackFor = Exception.class)
+    void batchAddQuestionsToBankInner(List<QuestionBankQuestion> questionBankQuestions);
 }
