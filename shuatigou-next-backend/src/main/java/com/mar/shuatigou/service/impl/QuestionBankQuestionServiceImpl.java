@@ -48,8 +48,6 @@ import java.util.stream.Collectors;
 /**
  * 题库题目关联服务实现
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
- * @from <a href="https://www.code-nav.cn">编程导航学习圈</a>
  */
 @Service
 @Slf4j
@@ -273,8 +271,10 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
             // 异步处理每批数据，将任务添加到异步任务列表
             CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 questionBankQuestionService.batchAddQuestionsToBankInner(questionBankQuestions);
-            }, customExecutor);
-            futures.add(future);
+            }, customExecutor).exceptionally(ex -> {
+                log.error("批处理任务执行失败", ex);
+                return null;
+            });
         }
         // 等待所有批次完成操作
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
@@ -328,4 +328,6 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "从题库移除题目失败");
         }
     }
+
+
 }
